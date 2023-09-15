@@ -1,11 +1,12 @@
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.ReUtil;
+import cn.hutool.http.HttpUtil;
+
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,14 +23,14 @@ public class IO_learning1 {
         String boyNameNet = "http://www.haoming8.cn/baobao/10881.html";
         String girlNameNet = "http://www.haoming8.cn/baobao/7641.html";
         //2 爬取数据
-        String familyNameStr = webCrawler(familyNameNet);
-        String boyNameStr = webCrawler(boyNameNet);
-        String girlNameStr = webCrawler(girlNameNet);
+        String familyNameStr = HttpUtil.get(familyNameNet);
+        String boyNameStr = HttpUtil.get(boyNameNet);
+        String girlNameStr = HttpUtil.get(girlNameNet);
 
         //3正则表达式提取数据
-        ArrayList<String> familyName = getData(familyNameStr, ".{4}(?=，|。)");
-        ArrayList<String> boyName = getData(boyNameStr, "([\u4E00-\u9FA5]{2})(?=、)");
-        ArrayList<String> girlName = getData(girlNameStr, "(.{2}\\s){4}");
+        List<String> familyName = ReUtil.findAll("(.{4})(，|。)",familyNameStr,1);
+        List<String> boyName = ReUtil.findAll("([\\u4E00-\\u9FA5]{2})(?=、)",boyNameStr,0);
+        List<String> girlName = ReUtil.findAll("(.. ){4}..",girlNameStr,1);
         //4处理数据
         ArrayList<String> familyNameList = new ArrayList<>();
         for (String s : familyName) {
@@ -52,15 +53,10 @@ public class IO_learning1 {
         }
 
         //5生成数据
-        ArrayList<String> name = getName(familyNameList, boyNameList, girlNameList, 3, 2);
+        ArrayList<String> name = getName(familyNameList, boyNameList, girlNameList, 35, 25);
         Collections.shuffle(name);
         //6 数据写入
-        BufferedWriter br = new BufferedWriter(new FileWriter("name.txt"));
-        for (String s : name) {
-            br.write(s);
-            br.newLine();
-        }
-        br.close();
+        FileUtil.writeLines(name, "name.txt","UTF-8");
     }
 
     private static ArrayList<String> getName(ArrayList<String> familyNameList, ArrayList<String> boyNameList, ArrayList<String> girlNameList, int boyNumber, int girlNumber) {
@@ -101,17 +97,5 @@ public class IO_learning1 {
         return list;
     }
 
-    public static String webCrawler(String net) throws IOException {
-        //定义StringBuilder对象
-        StringBuilder sb = new StringBuilder();
-        URL url = new URL(net);
-        URLConnection urlConnection = url.openConnection();
-        //读取数据
-        InputStreamReader isr = new InputStreamReader(urlConnection.getInputStream());
-        int ch;
-        while ((ch = isr.read()) != -1) {
-            sb.append((char) ch);
-        }
-        return sb.toString();
-    }
+
 }
