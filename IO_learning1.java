@@ -5,6 +5,7 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -51,7 +52,7 @@ public class IO_learning1 {
         }
 
         //5生成数据
-        ArrayList<String> name = getName(familyNameList, boyNameList, girlNameList, 35, 25);
+        ArrayList<String> name = getName(familyNameList, boyNameList, girlNameList, 3, 2);
         Collections.shuffle(name);
         //6 数据写入
         BufferedWriter br = new BufferedWriter(new FileWriter("name.txt"));
@@ -64,18 +65,28 @@ public class IO_learning1 {
 
     private static ArrayList<String> getName(ArrayList<String> familyNameList, ArrayList<String> boyNameList, ArrayList<String> girlNameList, int boyNumber, int girlNumber) {
         ArrayList<String> nameList = new ArrayList<>();
-        for (int i = 0; i < boyNumber; i++) {
+        while (boyNumber > 0) {
+
             Collections.shuffle(familyNameList);
             Collections.shuffle(boyNameList);
             String s = familyNameList.get(0) + boyNameList.get(0);
-            nameList.add(s);
+            if (!nameList.contains(s)) {
+                nameList.add(s);
+                boyNumber--;
+            }
         }
-        for (int i = 0; i < girlNumber; i++) {
+
+
+        while (girlNumber > 0) {
             Collections.shuffle(familyNameList);
             Collections.shuffle(girlNameList);
             String s = familyNameList.get(0) + girlNameList.get(0);
-            nameList.add(s);
+            if (!girlNameList.contains(s)) {
+                nameList.add(s);
+                girlNumber--;
+            }
         }
+
         return nameList;
     }
 
